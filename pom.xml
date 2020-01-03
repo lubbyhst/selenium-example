@@ -21,7 +21,7 @@
     <modules>
         <module>webapp-demo</module>
         <module>docker</module>
-        <module>system-tests</module>
+        <module>systemtests</module>
     </modules>
 
     <build>

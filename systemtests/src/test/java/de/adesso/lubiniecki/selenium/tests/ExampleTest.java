@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import de.adesso.lubiniecki.selenium.base.TestBase;
 import de.adesso.lubiniecki.selenium.pages.DemoTestPage;
+import de.adesso.lubiniecki.selenium.pages.SuccessPage;
 
 public class ExampleTest extends TestBase {
 
@@ -12,7 +13,7 @@ public class ExampleTest extends TestBase {
     public void testInputClearAfterSubmit() {
         DemoTestPage demoTestPage = DemoTestPage.openDemoTestPage(driver);
         demoTestPage.writeIntoTestInput("test");
-        demoTestPage.clickButton();
-        Assertions.assertTrue(demoTestPage.getValueFromInput().isEmpty());
+        SuccessPage successPage = demoTestPage.clickButton();
+        Assertions.assertEquals("Ok!", successPage.getResult());
     }
 }

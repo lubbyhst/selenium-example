@@ -31,8 +31,9 @@ public class DemoTestPage extends BasePage {
         input(testInput, value);
     }
 
-    public void clickButton() {
+    public SuccessPage clickButton() {
         testButton.click();
+        return new SuccessPage(this.driver);
     }
 
     public String getTextFromLabel() {

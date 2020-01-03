@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.adesso.lubiniecki.docker</groupId>
+        <artifactId>docker-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <groupId>de.adesso.lubiniecki.docker</groupId>
+    <artifactId>demo-container</artifactId>
+
+    <properties>
+        <docker.demo.image.name>demo/app:${project.version}</docker.demo.image.name>
+        <docker.demo.http.port>8080</docker.demo.http.port>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.adesso.lubiniecki</groupId>
+            <artifactId>webapp-demo</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>copy-dockerfiles</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${docker.files.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${docker.files.base.directory}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+                <executions>
+                    <execution>
+                        <id>copy SOWON binaries</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>de.adesso.lubiniecki</groupId>
+                                    <artifactId>webapp-demo</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${docker.files.build.directory}/jar</outputDirectory>
+                                    <destFileName>demo.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <autoPull>${docker.autopull}</autoPull>
+                    <verbose>${docker.verbose}</verbose>
+                    <images>
+                        <image>
+                            <name>${docker.demo.image.name}</name>
+                            <alias>demo</alias>
+                            <build>
+                                <nocache>${docker.nocache}</nocache>
+                                <compression>none</compression>
+                                <dockerFileDir>${docker.files.build.directory}</dockerFileDir>
+                            </build>
+                            <run>
+                                <skip>${docker.skip}</skip>
+                                <network>
+                                    <mode>bridge</mode>
+                                    <alias>demo</alias>
+                                </network>
+                                <namingStrategy>alias</namingStrategy>
+                                <env>
+                                    <DBUS_SESSION_BUS_ADDRESS>/dev/null</DBUS_SESSION_BUS_ADDRESS>
+                                </env>
+                                <ports>
+                                    <port>${docker.demo.http.port}:8080</port>
+                                </ports>
+                                <wait>
+                                    <log>.*Started WebappDemoApplication.*</log>
+                                    <time>${docker.run.wait.timeout}</time>
+                                </wait>
+                                <log>
+                                    <enabled>${docker.logging}</enabled>
+                                    <prefix>demo:</prefix>
+                                    <date>DEFAULT</date>
+                                </log>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build docker images</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>push docker images</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

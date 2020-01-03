@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.adesso.lubiniecki.docker</groupId>
+        <artifactId>docker-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <groupId>de.adesso.lubiniecki.docker</groupId>
+    <artifactId>selenium-hub-container</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <selenium.browser>chrome</selenium.browser>
+        <docker.selenium.image.name>selenium/standalone-${selenium.browser}-debug:${selenium.version}</docker.selenium.image.name>
+        <docker.selenium.hub.port.placeholder>4444</docker.selenium.hub.port.placeholder>
+        <docker.selenium.vnc.port.placeholder>5900</docker.selenium.vnc.port.placeholder>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>${docker.selenium.image.name}</name>
+                            <alias>selenium-${selenium.browser}</alias>
+                            <run>
+                                <network>
+                                    <mode>bridge</mode>
+                                    <alias>selenium</alias>
+                                </network>
+                                <namingStrategy>alias</namingStrategy>
+                                <links>
+                                    <link>demo</link>
+                                </links>
+                                <env>
+                                    <DBUS_SESSION_BUS_ADDRESS>/dev/null</DBUS_SESSION_BUS_ADDRESS>
+                                </env>
+                                <ports>
+                                    <port>${docker.selenium.hub.port.placeholder}:4444</port>
+                                    <port>${docker.selenium.vnc.port.placeholder}:5900</port>
+                                </ports>
+                                <wait>
+                                    <log>.*Selenium Server is up and running.*</log>
+                                    <time>${docker.run.wait.timeout}</time>
+                                </wait>
+                                <log>
+                                    <enabled>${docker.logging}</enabled>
+                                    <prefix>SELENIUM</prefix>
+                                    <date>DEFAULT</date>
+                                </log>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build docker images</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>push docker images</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

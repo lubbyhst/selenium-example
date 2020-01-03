@@ -1,2 +1,2 @@
-# selenium-example
-Example project of selenium with maven and java
+# selenium-example-project
+Example project of selenium with maven, junit and docker

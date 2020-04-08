@@ -57,7 +57,7 @@
                 <version>2.10</version>
                 <executions>
                     <execution>
-                        <id>copy SOWON binaries</id>
+                        <id>copy demo binaries</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
@@ -77,9 +77,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>io.fabric8</groupId>
